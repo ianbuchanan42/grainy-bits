@@ -16,8 +16,21 @@
   font-size: 2.5rem;
   font-weight: 300;
   letter-spacing: 2px;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.1rem 0;
   color: #000000;
+}
+
+.logo {
+  max-width: 120px;
+  height: auto;
+  margin: 0.1rem auto;
+  display: block;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.logo:hover {
+  opacity: 1;
 }
 
 .subtitle {
@@ -71,30 +84,29 @@
   font-style: italic;
 }
 
-.footer {
-  text-align: center;
-  padding: 2rem 1rem;
-  border-top: 1px solid #e5e5e5;
-  margin-top: 4rem;
-}
-
-.footer p {
-  margin: 0;
-  color: #999999;
-  font-size: 0.9rem;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
   .title {
     font-size: 2rem;
   }
-  
+
+  .logo {
+    max-width: 100px;
+    margin: 0.8rem auto;
+  }
+
   .homeContent {
     padding: 2rem 1rem;
   }
-  
+
   .mainImage {
     max-height: 60vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    max-width: 80px;
+    margin: 0.6rem auto;
   }
 }
