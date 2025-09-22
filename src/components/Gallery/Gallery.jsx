@@ -188,6 +188,64 @@ const Gallery = ({ category }) => {
             </div>
           </div>
         </div>
+
+        {/* Featured Article Section */}
+        <div className={styles.articleSection}>
+          <div className={styles.articleContainer}>
+            <div className={styles.articleContent}>
+              <div className={styles.articleHeader}>
+                <h2 className={styles.articleTitle}>Featured Article</h2>
+                <p className={styles.articleSubtitle}>
+                  Behind the Curtains: Documenting Ballet on Film
+                </p>
+              </div>
+
+              <div className={styles.articleDescription}>
+                <p className={styles.articleText}>
+                  Maggie Carey was recently featured in Lomography Magazine,
+                  sharing her journey as a professional ballet dancer and film
+                  photographer. The article explores how she documents the
+                  intimate moments of ballet life — from rehearsals to backstage
+                  preparations — using various Lomography film stocks including
+                  Earl Grey B&W, LomoChrome Purple, and Lomography Color
+                  Negative 400.
+                </p>
+
+                <blockquote className={styles.articleQuote}>
+                  "The career of a ballet dancer is so fleeting, and through
+                  photography I am able to document and freeze moments in time
+                  exactly as I remember them."
+                </blockquote>
+
+                <p className={styles.articleText}>
+                  Read the full interview to learn about Maggie's creative
+                  process, her favorite Lomography films, and how her dual
+                  careers in ballet and photography complement each other.
+                </p>
+              </div>
+
+              <a
+                href='https://www.lomography.com/magazine/352618-behind-the-curtains-documenting-ballet-on-film-with-maggie-carey'
+                target='_blank'
+                rel='noopener noreferrer'
+                className={styles.articleButton}
+              >
+                Read Full Article
+              </a>
+            </div>
+
+            <div className={styles.articleImage}>
+              <img
+                src='https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Article/lomography.jpg'
+                alt='Lomography Magazine Article Feature'
+                className={styles.articleImagePhoto}
+              />
+              <p className={styles.articleImageCaption}>
+                taken on Earl Grey 100 and Lomo 400 35mm film.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
