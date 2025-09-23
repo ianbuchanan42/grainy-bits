@@ -9,6 +9,7 @@ const Navigation = ({ activeTab, onTabChange }) => {
     { id: 'dance', label: 'Dance' },
     { id: 'wedding', label: 'Wedding' },
     { id: 'art', label: 'Art' },
+    { id: 'videos', label: 'Dance Films' },
   ];
 
   const toggleMenu = () => {
