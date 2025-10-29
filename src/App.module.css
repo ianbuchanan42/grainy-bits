@@ -10,6 +10,7 @@
   text-align: center;
   padding: 2rem 1rem;
   border-bottom: 1px solid #e5e5e5;
+  cursor: pointer;
 }
 
 .title {
@@ -18,6 +19,8 @@
   letter-spacing: 2px;
   margin: 0 0 0.1rem 0;
   color: #000000;
+  transition: opacity 0.3s ease;
+  opacity: 0.8;
 }
 
 .logo {
@@ -29,20 +32,53 @@
   transition: opacity 0.3s ease;
 }
 
-.logo:hover {
-  opacity: 1;
-}
-
 .subtitle {
   font-size: 1rem;
   font-weight: 400;
   margin: 0;
   color: #666666;
   letter-spacing: 1px;
+  transition: opacity 0.3s ease;
+  opacity: 0.8;
+}
+
+/* Unified hover effect for entire header */
+.header:hover .title,
+.header:hover .logo,
+.header:hover .subtitle {
+  opacity: 1;
 }
 
 .main {
   min-height: calc(100vh - 200px);
+  position: relative;
+  overflow: hidden; /* Prevent scrolling of hidden panels */
+}
+
+/* Professional tab switching: absolute positioning + visibility
+   This avoids layout reflow (display: none/block causes expensive recalculations)
+   Tab change is instant - just a visibility toggle with no layout impact
+   
+   content-visibility: auto tells browser to skip rendering until visible
+   This prevents ANY work on hidden tabs - images don't load, no re-renders */
+.contentPanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+  /* Skip ALL rendering work for hidden panels - this is the key */
+  content-visibility: hidden;
+  contain: strict; /* Maximum isolation - no re-renders, no image loading */
+}
+
+.contentPanel.active {
+  position: relative; /* Active panel takes normal flow */
+  visibility: visible;
+  pointer-events: auto;
+  content-visibility: auto; /* Browser decides what to render */
+  contain: layout style paint; /* Still contain but allow rendering */
 }
 
 .homeContent {

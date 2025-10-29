@@ -38,20 +38,21 @@
   font-weight: 400;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
-}
-
-.tab:hover {
-  color: #333333;
-  background: #f9f9f9;
 }
 
 .tab.active {
   color: #000000;
   border-bottom-color: #000000;
   font-weight: 500;
+  transition: none;
+}
+
+.tab:hover {
+  color: #333333;
+  background: #f9f9f9;
 }
 
 /* Hamburger Menu Styles */

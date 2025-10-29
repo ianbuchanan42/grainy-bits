@@ -71,18 +71,18 @@ export const imageConfig = {
     { filename: '000002050037.jpg', alt: '' },
   ],
   art: [
-    { filename: '000072970001.jpg', alt: '' },
-    { filename: '000072970002.jpg', alt: '' },
-    { filename: '000072970003.jpg', alt: '' },
-    { filename: '000072970004.jpg', alt: '' },
-    { filename: '000072970005.jpg', alt: '' },
-    { filename: '000072970006.jpg', alt: '' },
-    { filename: '000072970007.jpg', alt: '' },
-    { filename: '000072970008.jpg', alt: '' },
-    { filename: '000072970009.jpg', alt: '' },
-    { filename: '000072970010.jpg', alt: '' },
-    { filename: '000072970011.jpg', alt: '' },
-    { filename: '000072970012.jpg', alt: '' },
+    { filename: '000072970001.jpeg', alt: '' },
+    { filename: '000072970002.jpeg', alt: '' },
+    { filename: '000072970003.jpeg', alt: '' },
+    { filename: '000072970004.jpeg', alt: '' },
+    { filename: '000072970005.jpeg', alt: '' },
+    { filename: '000072970006.jpeg', alt: '' },
+    { filename: '000072970007.jpeg', alt: '' },
+    { filename: '000072970008.jpeg', alt: '' },
+    { filename: '000072970009.jpeg', alt: '' },
+    { filename: '000072970010.jpeg', alt: '' },
+    { filename: '000072970011.jpeg', alt: '' },
+    { filename: '000072970012.jpeg', alt: '' },
   ],
   videos: [
     {
@@ -132,6 +132,20 @@ export const imageConfig = {
       youtubeId: 'I-PJ277fr7E',
       type: 'video',
     },
+    {
+      id: 'tidal',
+      title: 'Tidal',
+      description:
+        'Choreographed by Maggie Carey and Ian Buchanan, edited by Maggie Carey.',
+      credits: {
+        choreography: 'Maggie Carey and Ian Buchanan',
+        editing: 'Maggie Carey',
+        music: 'Matthew Carey (@yalecollegegraduate)',
+      },
+      location: 'Monterey, CA',
+      youtubeId: 'fn-cPx67gcQ',
+      type: 'video',
+    },
   ],
 };
 
@@ -143,7 +157,7 @@ export const getImagesForCategory = (category) => {
   const folderMap = {
     dance: 'Dance',
     wedding: 'Wedding',
-    art: 'Misc',
+    art: 'Art',
   };
 
   // Handle videos differently
