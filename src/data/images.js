@@ -174,3 +174,39 @@ export const getImagesForCategory = (category) => {
     url: getImageUrl(folder, image.filename),
   }));
 };
+
+// Get all images from all categories for banner use
+export const getAllImages = () => {
+  const folderMap = {
+    dance: 'Dance',
+    wedding: 'Wedding',
+    art: 'Art',
+  };
+
+  const allImages = [];
+
+  Object.keys(folderMap).forEach((category) => {
+    const folder = folderMap[category];
+    const images = imageConfig[category] || [];
+    images.forEach((image) => {
+      allImages.push({
+        filename: image.filename,
+        alt: image.alt || `${category} photography`,
+        url: getImageUrl(folder, image.filename),
+        category,
+      });
+    });
+  });
+
+  return allImages;
+};
+
+// Shuffle array randomly (Fisher-Yates algorithm)
+export const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};

@@ -1,34 +1,75 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { getAllImages, shuffleArray } from '../../data/images';
 import styles from './HomePage.module.css';
 
 const HomePage = () => {
-  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
-  const heroImageUrl =
-    'https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Home/000057380024.jpg';
+  const [loadedImages, setLoadedImages] = useState(new Set());
 
+  // Get random banner images that persist for the session
+  const bannerImages = useMemo(() => {
+    const sessionKey = 'grainy-bits-banner-images';
+    const stored = sessionStorage.getItem(sessionKey);
+
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        // If parsing fails, generate new ones
+      }
+    }
+
+    // Get all images and shuffle them
+    const allImages = getAllImages();
+    const shuffled = shuffleArray(allImages);
+    // Select 6 random images for the banner
+    const selected = shuffled.slice(0, 6);
+
+    // Store in sessionStorage so they persist during this session
+    sessionStorage.setItem(sessionKey, JSON.stringify(selected));
+    return selected;
+  }, []);
+
+  // Track when each banner image is loaded
   useEffect(() => {
-    // Preload hero image
-    const img = new Image();
-    img.onload = () => setHeroImageLoaded(true);
-    img.src = heroImageUrl;
-  }, [heroImageUrl]);
+    bannerImages.forEach((image) => {
+      const img = new Image();
+      img.onload = () => {
+        setLoadedImages((prev) => new Set([...prev, image.url]));
+      };
+      img.onerror = () => {
+        // Mark as loaded even on error to not block display
+        setLoadedImages((prev) => new Set([...prev, image.url]));
+      };
+      img.src = image.url;
+    });
+  }, [bannerImages]);
 
   return (
     <div className={styles.homeContent}>
-      <div className={styles.heroImage}>
-        <img
-          src={heroImageUrl}
-          alt='Maggie Carey Photography'
-          className={styles.mainImage}
-          loading='eager'
-          decoding='async'
-          style={{ opacity: heroImageLoaded ? 1 : 0 }}
-        />
-      </div>
       <div className={styles.content}>
         <p className={styles.description}>
           Welcome to my photography portfolio.
         </p>
+      </div>
+      <div className={styles.banner}>
+        {bannerImages.map((image, index) => (
+          <div
+            key={`${image.category}-${image.filename}`}
+            className={styles.bannerImageContainer}
+          >
+            <img
+              src={image.url}
+              alt={image.alt || `Photography by Maggie Carey ${index + 1}`}
+              className={styles.bannerImage}
+              loading='eager'
+              decoding='async'
+              style={{
+                opacity: loadedImages.has(image.url) ? 1 : 0,
+                transition: 'opacity 0.3s ease',
+              }}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Book Highlight Section */}
@@ -70,7 +111,14 @@ const HomePage = () => {
               </p>
             </div>
 
-            <button className={styles.bookButton}>Purchase Book</button>
+            <a
+              href='https://www.blurb.com/b/11566336-grainy-bits-volume-1'
+              target='_blank'
+              rel='noopener noreferrer'
+              className={styles.bookButton}
+            >
+              Purchase Book
+            </a>
           </div>
         </div>
       </div>

@@ -5,25 +5,42 @@
   padding: 3rem 1rem;
 }
 
-.heroImage {
+.banner {
   margin-bottom: 3rem;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  width: 100%;
 }
 
-.mainImage {
-  max-width: 100%;
-  height: auto;
-  max-height: 80vh;
-  object-fit: contain;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e5e5;
+.bannerImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  margin: 0 auto;
-  opacity: 1;
-  transition: opacity 0.3s ease;
+}
+
+/* Responsive: show fewer images on smaller screens */
+@media (max-width: 768px) {
+  .banner {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+  }
 }
 
 .content {
@@ -38,6 +55,7 @@
   margin: 0;
   line-height: 1.8;
   font-style: italic;
+  margin-bottom: 2rem;
 }
 
 /* Book Section Styles */
@@ -138,6 +156,7 @@
 }
 
 .bookButton {
+  display: inline-block;
   background: #000000;
   color: #ffffff;
   border: none;
@@ -148,6 +167,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
 }
 
 .bookButton:hover {
