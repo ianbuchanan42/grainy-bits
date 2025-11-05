@@ -1,0 +1,75 @@
+import { memo, useCallback } from 'react';
+import styles from '../Gallery.module.css';
+
+/**
+ * GALLERY IMAGE ITEM COMPONENT
+ *
+ * Memoized component for individual gallery images to prevent unnecessary re-renders.
+ *
+ * PROS:
+ * - Only re-renders when props change (React.memo optimization)
+ * - Prevents re-rendering unchanged images when tab switches
+ * - Cleaner code organization
+ * - Easier to test independently
+ *
+ * CONS:
+ * - Additional component overhead (minimal)
+ * - Need to pass more props
+ *
+ * PERFORMANCE:
+ * - React.memo prevents re-renders when props haven't changed
+ * - Critical for smooth tab switching (hundreds of images)
+ *
+ * NOTE: onImageLoad prop is a function that tracks loaded images.
+ * This keeps the loadedImagesSet management in the parent Gallery component.
+ */
+const GalleryImageItem = memo(
+  ({
+    image,
+    index,
+    category,
+    isActive,
+    isLoaded,
+    onImageClick,
+    onImageLoad,
+  }) => {
+    // First 6 images load immediately when tab becomes active (above fold priority)
+    const shouldLoadImmediately = isActive && index < 6;
+
+    const handleLoad = useCallback(() => {
+      // Track loaded images to prevent reloading
+      if (onImageLoad) {
+        onImageLoad(image.url);
+      }
+    }, [image.url, onImageLoad]);
+
+    return (
+      <div
+        className={styles.imageContainer}
+        onClick={() => onImageClick(image.url)}
+      >
+        {isLoaded || shouldLoadImmediately ? (
+          <img
+            src={image.url}
+            alt={image.alt || `${category} photography ${index + 1}`}
+            className={styles.image}
+            loading={index < 6 ? 'eager' : 'lazy'}
+            decoding='async'
+            onLoad={handleLoad}
+          />
+        ) : (
+          <img
+            data-src={image.url}
+            alt={image.alt || `${category} photography ${index + 1}`}
+            className={styles.image}
+            decoding='async'
+          />
+        )}
+      </div>
+    );
+  }
+);
+
+GalleryImageItem.displayName = 'GalleryImageItem';
+
+export default GalleryImageItem;

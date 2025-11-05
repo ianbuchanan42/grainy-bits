@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getImagesForCategory } from '../../data/images';
+import { getImagesForCategory } from '../../data/helper';
 import styles from './FilmPage.module.css';
 
 // Cache videos - load once at module init

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { getAllImages, shuffleArray } from '../../data/images';
+import { getAllImages, shuffleArray } from '../../data/helper';
 import styles from './HomePage.module.css';
 
 const HomePage = () => {
