@@ -1,4 +1,5 @@
 import { memo, useCallback } from 'react';
+import OptimizedImage from './OptimizedImage';
 import styles from '../Gallery.module.css';
 
 /**
@@ -48,23 +49,18 @@ const GalleryImageItem = memo(
         className={styles.imageContainer}
         onClick={() => onImageClick(image.url)}
       >
-        {isLoaded || shouldLoadImmediately ? (
-          <img
-            src={image.url}
-            alt={image.alt || `${category} photography ${index + 1}`}
-            className={styles.image}
-            loading={index < 6 ? 'eager' : 'lazy'}
-            decoding='async'
-            onLoad={handleLoad}
-          />
-        ) : (
-          <img
-            data-src={image.url}
-            alt={image.alt || `${category} photography ${index + 1}`}
-            className={styles.image}
-            decoding='async'
-          />
-        )}
+        <OptimizedImage
+          src={image.url}
+          alt={image.alt || `${category} photography ${index + 1}`}
+          className={styles.image}
+          lazy={!isLoaded && !shouldLoadImmediately}
+          dataSrc={image.url}
+          isLoaded={isLoaded}
+          shouldLoadImmediately={shouldLoadImmediately}
+          loading={index < 6 ? 'eager' : 'lazy'}
+          decoding='async'
+          onLoad={handleLoad}
+        />
       </div>
     );
   }

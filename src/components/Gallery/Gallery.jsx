@@ -1,80 +1,13 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { getImagesForCategory, CATEGORIES } from '../../data/helper';
 import GalleryImageItem from './components/GalleryImageItem';
+import ImageModal from './components/ImageModal';
 import styles from './Gallery.module.css';
 
-/**
- * MODULE-LEVEL CACHE SYSTEM
- *
- * Purpose: Store image metadata once at module load, shared across all Gallery instances.
- *
- * PROS:
- * - Prevents re-fetching image data on every render
- * - Shared across all Gallery components (dance, wedding, art tabs)
- * - Synchronous access - no async state management needed
- * - Memory efficient - single source of truth
- *
- * CONS:
- * - Lives in memory for entire app lifetime (won't clear until page refresh)
- * - Not reactive - won't update if image data changes without page reload
- * - Could grow large if many categories/images are added
- *
- * BETTER SOLUTIONS:
- * - Use React Context for shared cache (would allow clearing/updating)
- * - Use IndexedDB for persistent cache across sessions
- * - Implement cache expiration/eviction policy
- * - Use SWR or React Query for automatic cache management
- */
 const imageCache = new Map();
 
-/**
- * LOADED IMAGES TRACKING
- *
- * Purpose: Track which image URLs have been loaded to prevent duplicate network requests.
- *
- * PROS:
- * - Prevents reloading same image when switching tabs
- * - Simple Set lookup - O(1) performance
- * - Persists across tab switches and component re-renders
- * - Prevents browser from re-fetching cached images
- *
- * CONS:
- * - Never clears - grows indefinitely (could use memory)
- * - No distinction between categories (if same URL exists in multiple categories)
- * - Doesn't track failed loads (would retry failed images)
- *
- * BETTER SOLUTIONS:
- * - Use WeakMap keyed by Image element (auto-cleanup)
- * - Add expiration timestamps for cache invalidation
- * - Track load status (loading, loaded, error) for better UX
- * - Use Service Worker for advanced caching strategies
- */
 const loadedImagesSet = new Set();
 
-/**
- * CACHE INITIALIZATION
- *
- * Purpose: Preload all category image metadata when module first loads.
- *
- * PROS:
- * - Instant access to image data when user clicks tabs
- * - Catches errors early (before user interaction)
- * - Runs once, not on every component mount
- * - No blocking - happens during module initialization
- *
- * CONS:
- * - Loads ALL categories even if user never visits them
- * - Synchronous - if getImagesForCategory is slow, delays module load
- * - No retry mechanism if initialization fails
- * - Hardcoded category list - must update if categories change
- *
- * BETTER SOLUTIONS:
- * - Lazy load categories on first tab click
- * - Use dynamic import for category data
- * - Add retry logic with exponential backoff
- * - Fetch from API endpoint instead of static JSON
- * - Use Suspense boundaries for progressive loading
- */
 const initializeCache = () => {
   CATEGORIES.forEach((cat) => {
     if (!imageCache.has(cat)) {
@@ -89,114 +22,36 @@ const initializeCache = () => {
   });
 };
 
-// Initialize cache on module load (runs once when file is imported)
 initializeCache();
 
-/**
- * GALLERY COMPONENT
- *
- * Props:
- * - category: 'dance' | 'wedding' | 'art' - which gallery to display
- * - isActive: boolean - whether this tab is currently visible
- *
- * DESIGN PHILOSOPHY:
- * Optimized for smooth tab switching by minimizing re-renders and preventing
- * image reloads. Images that have loaded once stay loaded.
- */
 const Gallery = ({ category, isActive }) => {
   /**
-   * SELECTED IMAGE STATE
-   *
-   * Purpose: Track which image is clicked for modal display.
-   *
-   * PROS:
-   * - Simple state management
-   * - Local to component (no global state needed)
-   *
-   * CONS:
-   * - Resets when component unmounts (tab switch)
-   * - Could use URL state for shareable links
-   *
-   * BETTER SOLUTIONS:
    * - Use URL hash/query params for shareable image links
    * - Use React Context if modal needs to persist across tabs
    * - Use history API for back button support
    */
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Memoize click handler to prevent GalleryImageItem re-renders
   const handleImageClick = useCallback((url) => {
     setSelectedImage(url);
   }, []);
 
-  // Memoize load handler to track loaded images
   const handleImageLoad = useCallback((url) => {
     if (!loadedImagesSet.has(url)) {
       loadedImagesSet.add(url);
     }
   }, []);
 
-  /**
-   * DOM REFS
-   *
-   * gridRef: Reference to grid container for querying image elements
-   * observerRef: Reference to IntersectionObserver instance (persists across renders)
-   *
-   * PROS:
-   * - Direct DOM access without re-renders
-   * - Observer persists - no recreation overhead
-   *
-   * CONS:
-   * - Bypasses React's virtual DOM (less React-like)
-   * - Potential for memory leaks if not cleaned up properly
-   */
   const gridRef = useRef(null);
+
   const observerRef = useRef(null);
 
-  /**
-   * IMAGE LIST MEMOIZATION
-   *
-   * Purpose: Get filtered image list for current category, memoized to prevent recalculation.
-   *
-   * PROS:
-   * - Only recalculates when category changes
-   * - Synchronous access from cache (no loading state needed)
-   * - Filters out invalid images early
-   *
-   * CONS:
-   * - Filter runs on every category change (minor overhead)
-   * - No loading state - assumes cache is always ready
-   * - Filter logic could be moved to cache initialization
-   *
-   * BETTER SOLUTIONS:
-   * - Pre-filter during cache initialization
-   * - Add loading/error states for cache misses
-   * - Use React.memo on component if parent re-renders frequently
-   */
   const galleryImages = useMemo(() => {
     const cached = imageCache.get(category) || [];
     return cached;
   }, [category]);
 
   /**
-   * INTERSECTION OBSERVER SETUP
-   *
-   * Purpose: Lazy load images as they enter viewport, only when tab is active.
-   *
-   * ARCHITECTURE DECISIONS:
-   * 1. Observer persists across renders (created once, reused)
-   * 2. Only observes when tab is active (saves resources)
-   * 3. Checks loadedImagesSet to prevent duplicate loads
-   * 4. Uses requestIdleCallback to avoid blocking UI
-   *
-   * PROS:
-   * - Only loads images user will see
-   * - Doesn't block main thread (uses idle time)
-   * - Prevents duplicate network requests
-   * - Observer reuse reduces overhead
-   * - Early loading (100px margin) for smoother scrolling
-   *
-   * CONS:
    * - Observer persists even when tab inactive (minor memory)
    * - Effect runs on every isActive/galleryImages.length change
    * - querySelectorAll runs on every effect (could be optimized)
@@ -213,36 +68,33 @@ const Gallery = ({ category, isActive }) => {
    * - Add network-aware loading (reduce quality on slow connections)
    */
   useEffect(() => {
-    // Capture gridRef.current at effect start for cleanup function
     const gridElement = gridRef.current;
 
-    // Early return if inactive - prevents unnecessary work
     if (!isActive || !gridElement) {
       // Don't disconnect observer when inactive - keep it ready
       // PRO: Instant response when tab becomes active
       // CON: Observer stays in memory (minor)
       return;
     }
-
-    // Query all images waiting to load (those with data-src attribute)
-    // PRO: Simple, direct DOM query
-    // CON: Runs on every effect (could cache results)
+    /**
+     * DOM QUERY STRATEGY
+     *
+     * USE REFS FOR EACH IMAGE (Most React-like)
+     *    - Store refs in GalleryImageItem components
+     *    - Pass refs up to parent via callback ref
+     *    - PRO: No DOM queries, direct element access
+     *    - CON: More complex, requires ref management
+ 
+     *
+     * NATIVE LAZY LOADING (Simplest)
+     *    - Use loading="lazy" on all images
+     *    - Let browser handle it
+     *    - PRO: Zero JavaScript overhead
+     *    - CON: Less control, can't customize loading behavior
+     *
+     */
     const imageElements = gridElement.querySelectorAll('img[data-src]');
 
-    /**
-     * OBSERVER CREATION (Single Instance Pattern)
-     *
-     * Only creates observer if it doesn't exist - reuses existing one.
-     *
-     * PROS:
-     * - No recreation overhead
-     * - Maintains observation state
-     * - Better performance
-     *
-     * CONS:
-     * - Observer never cleaned up (could leak if component unmounts)
-     * - Shared across all Gallery instances (could conflict if multiple active)
-     */
     if (!observerRef.current) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
@@ -251,21 +103,6 @@ const Gallery = ({ category, isActive }) => {
               const img = entry.target;
               const imageUrl = img.dataset.src;
 
-              /**
-               * DUPLICATE LOAD PREVENTION
-               *
-               * Triple-check to prevent unnecessary loads:
-               * 1. imageUrl exists
-               * 2. Not in loadedImagesSet
-               * 3. img.src not already set
-               *
-               * PROS:
-               * - Bulletproof duplicate prevention
-               * - Handles edge cases
-               *
-               * CONS:
-               * - Multiple checks (minor overhead)
-               */
               if (!imageUrl || loadedImagesSet.has(imageUrl) || img.src) {
                 observerRef.current?.unobserve(img);
                 return;
@@ -417,53 +254,12 @@ const Gallery = ({ category, isActive }) => {
         })}
       </div>
 
-      {
-        /**
-         * IMAGE MODAL
-         *
-         * Displays clicked image in full-screen modal overlay.
-         *
-         * PROS:
-         * - Simple, local state management
-         * - Click outside to close (good UX)
-         * - Close button for explicit dismissal
-         *
-         * CONS:
-         * - No keyboard navigation (ESC to close)
-         * - No image navigation (prev/next)
-         * - No zoom/pan functionality
-         * - Modal image loads immediately (could be large)
-         * - No loading state for modal image
-         * - Resets when component unmounts (tab switch)
-         *
-         * BETTER SOLUTIONS:
-         * - Add keyboard event listeners (ESC, arrow keys)
-         * - Implement image navigation (prev/next)
-         * - Add zoom/pan with touch gestures
-         * - Use Intersection Observer for modal image lazy loading
-         * - Implement shared element transitions
-         * - Add image preloading for adjacent images
-         * - Use React Portal for better modal rendering
-         * - Add analytics tracking for image views
-         */
-        selectedImage && (
-          <div className={styles.modal} onClick={() => setSelectedImage(null)}>
-            <div className={styles.modalContent}>
-              <img
-                src={selectedImage}
-                alt='Full size'
-                className={styles.modalImage}
-              />
-              <button
-                className={styles.closeButton}
-                onClick={() => setSelectedImage(null)}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )
-      }
+      {/* Enhanced Image Modal with navigation and keyboard support */}
+      <ImageModal
+        imageUrl={selectedImage}
+        images={galleryImages}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 };
