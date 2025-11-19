@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { getImagesForCategory } from '../../data/helper';
 import styles from './FilmPage.module.scss';
 import { VideoData } from '../../types';
@@ -28,6 +28,21 @@ const FilmPage = ({ isActive }: FilmPageProps) => {
       threshold: 0.25,
     });
 
+  // Fallback: ensure videos load after a short delay when tab is active
+  // This helps with IntersectionObserver timing issues in production
+  const [forceLoad, setForceLoad] = useState(false);
+  useEffect(() => {
+    if (isActive) {
+      // Give IntersectionObserver a chance, then force load if needed
+      const timer = setTimeout(() => {
+        setForceLoad(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setForceLoad(false);
+    }
+  }, [isActive]);
+
   return (
     <div className={styles.videosSection}>
       <div className={styles.videosContainer}>
@@ -45,9 +60,9 @@ const FilmPage = ({ isActive }: FilmPageProps) => {
             >
               <div className={styles.videoPlayer}>
                 {/* Only load iframe src when panel is active - prevents YouTube from loading */}
-                {isActive && isVideoVisible(video.id) ? (
+                {isActive && (isVideoVisible(video.id) || forceLoad) ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                    src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1`}
                     title={video.title}
                     frameBorder='0'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
