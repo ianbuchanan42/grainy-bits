@@ -26,20 +26,21 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  opacity: 0;
+  transform: scale(1.01);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  will-change: opacity, transform;
 }
 
-/* Responsive: show fewer images on smaller screens */
-@media (max-width: 768px) {
-  .banner {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0.4rem;
-  }
+.bannerImageVisible {
+  opacity: 1;
+  transform: scale(1);
 }
 
-@media (max-width: 480px) {
-  .banner {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.3rem;
+@media (prefers-reduced-motion: reduce) {
+  .bannerImage {
+    transition: opacity 0.3s ease;
+    transform: none;
   }
 }
 
@@ -86,10 +87,10 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
   transition: transform 0.3s ease;
-}
 
-.bookImage:hover {
-  transform: scale(1.02);
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 
 .bookDetails {
@@ -169,12 +170,12 @@
   text-transform: uppercase;
   text-decoration: none;
   border-radius: 2px;
-}
 
-.bookButton:hover {
-  background: #333333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  &:hover {
+    background: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* Article Section Styles */
@@ -254,12 +255,12 @@
   transition: all 0.3s ease;
   text-transform: uppercase;
   border-radius: 2px;
-}
 
-.articleButton:hover {
-  background: #333333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  &:hover {
+    background: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 
 .articleImage {
@@ -277,11 +278,11 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e5e5;
   transition: all 0.3s ease;
-}
 
-.articleImagePhoto:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .articleImageCaption {
@@ -296,6 +297,11 @@
 
 /* Mobile-first responsive design */
 @media (max-width: 768px) {
+  .banner {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.4rem;
+  }
+
   .bookContainer {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -342,6 +348,11 @@
 }
 
 @media (max-width: 480px) {
+  .banner {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+  }
+
   .bookSection {
     margin-top: 2rem;
     padding: 2rem 0;
@@ -389,3 +400,4 @@
     max-width: 150px;
   }
 }
+

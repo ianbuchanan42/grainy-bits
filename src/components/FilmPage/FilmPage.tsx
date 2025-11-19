@@ -1,20 +1,32 @@
 import { useMemo } from 'react';
 import { getImagesForCategory } from '../../data/helper';
-import styles from './FilmPage.module.css';
+import styles from './FilmPage.module.scss';
+import { VideoData } from '../../types';
+import useVisibilityObserver from '../../hooks/useVisibilityObserver';
+
+interface FilmPageProps {
+  isActive: boolean;
+}
 
 // Cache videos - load once at module init
 const videoCache = (() => {
   try {
-    return getImagesForCategory('videos');
+    return getImagesForCategory('videos') as VideoData[];
   } catch (error) {
     console.error('Error loading videos:', error);
     return [];
   }
 })();
 
-const FilmPage = ({ isActive }) => {
+const FilmPage = ({ isActive }: FilmPageProps) => {
   // Get videos from cache - no state, no re-renders
   const videos = useMemo(() => videoCache, []);
+  const { registerElement: registerVideoRef, isVisible: isVideoVisible } =
+    useVisibilityObserver<string>({
+      isActive,
+      rootMargin: '100px 0px',
+      threshold: 0.25,
+    });
 
   return (
     <div className={styles.videosSection}>
@@ -26,10 +38,14 @@ const FilmPage = ({ isActive }) => {
 
         <div className={styles.videosGrid}>
           {videos.map((video) => (
-            <div key={video.id} className={styles.videoCard}>
+            <div
+              key={video.id}
+              className={styles.videoCard}
+              ref={(el) => registerVideoRef(video.id, el)}
+            >
               <div className={styles.videoPlayer}>
                 {/* Only load iframe src when panel is active - prevents YouTube from loading */}
-                {isActive ? (
+                {isActive && isVideoVisible(video.id) ? (
                   <iframe
                     src={`https://www.youtube.com/embed/${video.youtubeId}`}
                     title={video.title}
@@ -97,3 +113,4 @@ const FilmPage = ({ isActive }) => {
 };
 
 export default FilmPage;
+

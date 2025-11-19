@@ -1,4 +1,4 @@
-import styles from './Footer.module.css'
+import styles from './Footer.module.scss'
 import instagramIcon from '../../assets/instagram-round.svg'
 import instagramIconBlack from '../../assets/instagram-round-black.svg'
 
@@ -38,3 +38,4 @@ const Footer = () => {
 }
 
 export default Footer
+

@@ -50,6 +50,16 @@
   padding: 0.5rem;
   border-radius: 4px;
   position: relative;
+
+  &:hover {
+    .instagramIcon {
+      opacity: 0;
+    }
+
+    .instagramIconHover {
+      opacity: 1;
+    }
+  }
 }
 
 .instagramIcon {
@@ -67,14 +77,6 @@
   opacity: 0;
   transition: opacity 0.3s ease;
   display: block;
-}
-
-.instagramLink:hover .instagramIcon {
-  opacity: 0;
-}
-
-.instagramLink:hover .instagramIconHover {
-  opacity: 1;
 }
 
 .instagramText {
@@ -128,3 +130,4 @@
     font-size: 0.8rem;
   }
 }
+

@@ -35,10 +35,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(
-    3,
-    1fr
-  ); /* 3 columns for 3×2 grid (6 images above fold) */
+  grid-template-columns: repeat(3, 1fr); /* 3 columns for 3×2 grid (6 images above fold) */
   gap: 1rem;
   margin-bottom: 2rem;
   min-height: 200px; /* Prevent layout shift */
@@ -55,52 +52,52 @@
   width: 100%;
   height: 0;
   padding-bottom: 100%; /* Maintains 1:1 aspect ratio */
-}
 
-.imageContainer img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.3s ease;
-  background: #f0f0f0; /* Placeholder background while loading */
-}
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+    background: #f0f0f0; /* Placeholder background while loading */
 
-/* Images without src (only data-src) - show placeholder */
-.imageContainer img:not([src]) {
-  background: #f0f0f0;
-  opacity: 0.5;
-}
+    /* Images without src (only data-src) - show placeholder */
+    &:not([src]) {
+      background: #f0f0f0;
+      opacity: 0.5;
+    }
 
-/* Images with data-src that haven't loaded yet */
-.imageContainer img[data-src] {
-  background: #f0f0f0;
-  opacity: 0.5;
-}
+    /* Images with data-src that haven't loaded yet */
+    &[data-src] {
+      background: #f0f0f0;
+      opacity: 0.5;
+    }
 
-.imageContainer img[loading='lazy'] {
-  opacity: 0.8;
-  filter: blur(1px);
-  transition: all 0.3s ease;
-}
+    &[loading='lazy'] {
+      opacity: 0.8;
+      filter: blur(1px);
+      transition: all 0.3s ease;
 
-.imageContainer img[loading='lazy']:not([src='']) {
-  opacity: 1;
-  filter: none;
-}
+      &:not([src='']) {
+        opacity: 1;
+        filter: none;
+      }
+    }
+  }
 
-.imageContainer:hover {
-  transform: scale(1.02);
+  &:hover {
+    transform: scale(1.02);
+
+    .image {
+      opacity: 0.9;
+    }
+  }
 }
 
 .image {
   transition: opacity 0.3s ease;
-}
-
-.imageContainer:hover .image {
-  opacity: 0.9;
 }
 
 .modal {
@@ -146,6 +143,7 @@
   object-fit: contain;
   /* Ensure image respects safe areas */
   margin: auto;
+  transition: opacity 0.3s ease;
 }
 
 .closeButton {
@@ -168,10 +166,10 @@
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 1001;
-}
 
-.closeButton:hover {
-  opacity: 0.7;
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .modalNavButton {
@@ -183,7 +181,7 @@
   color: white;
   font-size: 3rem;
   cursor: pointer;
-  padding: 1rem 1.5rem;
+  padding: 0;
   line-height: 1;
   border-radius: 50%;
   width: 60px;
@@ -193,27 +191,41 @@
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 1001;
+
+  span {
+    display: inline-block;
+    line-height: 1;
+    transform: translateY(-0.1em);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
 }
 
 .modalNavButtonLeft {
   /* Ensure button is within safe area */
   left: max(1rem, env(safe-area-inset-left, 0px));
+
+  span {
+    margin-right: 5px;
+  }
 }
 
 .modalNavButtonRight {
   /* Ensure button is within safe area */
   left: auto;
   right: max(1rem, env(safe-area-inset-right, 0px));
-}
 
-.modalNavButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.modalNavButton:active {
-  transform: translateY(-50%) scale(0.95);
+  span {
+    margin-left: 5px;
+  }
 }
 
 .modalCounter {
@@ -258,10 +270,6 @@
   }
 }
 
-.modalImage {
-  transition: opacity 0.3s ease;
-}
-
 /* Mobile responsive */
 @media (max-width: 768px) {
   .modalContent {
@@ -296,10 +304,7 @@
     width: 40px;
     height: 40px;
   }
-}
 
-/* Mobile-first responsive design */
-@media (max-width: 768px) {
   .gallery {
     padding: 1rem 0.5rem;
   }
@@ -316,11 +321,6 @@
   .modal {
     padding: 1rem;
   }
-
-  .closeButton {
-    top: -30px;
-    font-size: 1.5rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -333,3 +333,4 @@
     aspect-ratio: 1;
   }
 }
+

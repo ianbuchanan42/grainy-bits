@@ -20,10 +20,10 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-}
 
-.tabList::-webkit-scrollbar {
-  display: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .tab {
@@ -41,18 +41,18 @@
   transition: background-color 0.2s ease, color 0.2s ease;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
-}
 
-.tab.active {
-  color: #000000;
-  border-bottom-color: #000000;
-  font-weight: 500;
-  transition: none;
-}
+  &.active {
+    color: #000000;
+    border-bottom-color: #000000;
+    font-weight: 500;
+    transition: none;
+  }
 
-.tab:hover {
-  color: #333333;
-  background: #f9f9f9;
+  &:hover {
+    color: #333333;
+    background: #f9f9f9;
+  }
 }
 
 /* Hamburger Menu Styles */
@@ -80,17 +80,21 @@
   transform-origin: center;
 }
 
-.hamburgerOpen .hamburgerLine:nth-child(1) {
-  transform: rotate(45deg) translate(7px, 7px);
-}
+.hamburgerOpen {
+  .hamburgerLine {
+    &:nth-child(1) {
+      transform: rotate(45deg) translate(7px, 7px);
+    }
 
-.hamburgerOpen .hamburgerLine:nth-child(2) {
-  opacity: 0;
-  /*transform: translateX(20px);*/
-}
+    &:nth-child(2) {
+      opacity: 0;
+      /*transform: translateX(20px);*/
+    }
 
-.hamburgerOpen .hamburgerLine:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
+    &:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+  }
 }
 
 /* Mobile Menu Overlay */
@@ -144,12 +148,12 @@
   transition: all 0.3s ease;
   text-align: left;
   border-bottom: 1px solid #f0f0f0;
-}
 
-.mobileTab:hover {
-  color: #333333;
-  background: #f9f9f9;
-  padding-left: 1rem;
+  &:hover {
+    color: #333333;
+    background: #f9f9f9;
+    padding-left: 1rem;
+  }
 }
 
 .mobileTabActive {
@@ -188,3 +192,4 @@
     min-width: 60px;
   }
 }
+

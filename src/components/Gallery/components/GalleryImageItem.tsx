@@ -1,6 +1,17 @@
 import { memo, useCallback } from 'react';
 import OptimizedImage from './OptimizedImage';
-import styles from '../Gallery.module.css';
+import styles from '../Gallery.module.scss';
+import { ImageData } from '../../../types';
+
+interface GalleryImageItemProps {
+  image: ImageData;
+  index: number;
+  category: string;
+  isActive: boolean;
+  isLoaded: boolean;
+  onImageClick: (url: string) => void;
+  onImageLoad: (url: string) => void;
+}
 
 /**
  * GALLERY IMAGE ITEM COMPONENT
@@ -24,7 +35,7 @@ import styles from '../Gallery.module.css';
  * NOTE: onImageLoad prop is a function that tracks loaded images.
  * This keeps the loadedImagesSet management in the parent Gallery component.
  */
-const GalleryImageItem = memo(
+const GalleryImageItem = memo<GalleryImageItemProps>(
   ({
     image,
     index,
@@ -39,7 +50,7 @@ const GalleryImageItem = memo(
 
     const handleLoad = useCallback(() => {
       // Track loaded images to prevent reloading
-      if (onImageLoad) {
+      if (onImageLoad && image.url) {
         onImageLoad(image.url);
       }
     }, [image.url, onImageLoad]);
@@ -47,7 +58,7 @@ const GalleryImageItem = memo(
     return (
       <div
         className={styles.imageContainer}
-        onClick={() => onImageClick(image.url)}
+        onClick={() => image.url && onImageClick(image.url)}
       >
         <OptimizedImage
           src={image.url}
@@ -69,3 +80,4 @@ const GalleryImageItem = memo(
 GalleryImageItem.displayName = 'GalleryImageItem';
 
 export default GalleryImageItem;
+

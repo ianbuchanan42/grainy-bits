@@ -1,10 +1,21 @@
-import { useState } from 'react';
-import styles from './Navigation.module.css';
+import { useState, MouseEvent } from 'react';
+import styles from './Navigation.module.scss';
+import { TabId } from '../../types';
 
-const Navigation = ({ activeTab, onTabChange }) => {
+interface NavigationProps {
+  activeTab: TabId;
+  onTabChange: (tabId: TabId) => void;
+}
+
+interface Tab {
+  id: TabId;
+  label: string;
+}
+
+const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const tabs = [
+  const tabs: Tab[] = [
     { id: 'home', label: 'Home' },
     { id: 'dance', label: 'Dance' },
     { id: 'wedding', label: 'Wedding' },
@@ -16,12 +27,12 @@ const Navigation = ({ activeTab, onTabChange }) => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleTabClick = (tabId) => {
+  const handleTabClick = (tabId: TabId) => {
     onTabChange(tabId);
     setIsMenuOpen(false); // Close menu when tab is selected
   };
 
-  const handleOverlayClick = (e) => {
+  const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setIsMenuOpen(false);
     }
@@ -84,3 +95,4 @@ const Navigation = ({ activeTab, onTabChange }) => {
 };
 
 export default Navigation;
+

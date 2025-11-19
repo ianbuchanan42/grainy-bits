@@ -5,7 +5,8 @@ import Gallery from './components/Gallery/Gallery';
 import FilmPage from './components/FilmPage/FilmPage';
 import Footer from './components/Footer/Footer';
 import logoImage from './assets/logo.png';
-import styles from './App.module.css';
+import styles from './App.module.scss';
+import { TabId, Category } from './types';
 
 // Memoize components to prevent re-renders when switching tabs
 const MemoizedHomePage = memo(HomePage);
@@ -13,10 +14,16 @@ const MemoizedGallery = memo(Gallery);
 const MemoizedFilmPage = memo(FilmPage);
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState<TabId>('home');
 
   // Use refs to directly manipulate DOM - bypasses React reconciliation
-  const panelsRef = useRef({
+  const panelsRef = useRef<{
+    home: HTMLDivElement | null;
+    dance: HTMLDivElement | null;
+    wedding: HTMLDivElement | null;
+    art: HTMLDivElement | null;
+    videos: HTMLDivElement | null;
+  }>({
     home: null,
     dance: null,
     wedding: null,
@@ -25,14 +32,14 @@ function App() {
   });
 
   // Direct DOM manipulation for instant tab switching - bypasses React render cycle
-  const handleTabChange = useCallback((tabId) => {
+  const handleTabChange = useCallback((tabId: TabId) => {
     // Update state for Navigation (urgent - user needs feedback)
     setActiveTab(tabId);
 
     // Directly toggle classes on DOM using refs - instant, no React reconciliation
     // This happens synchronously before React's render cycle
     Object.keys(panelsRef.current).forEach((tab) => {
-      const panel = panelsRef.current[tab];
+      const panel = panelsRef.current[tab as keyof typeof panelsRef.current];
       if (panel) {
         if (tab === tabId) {
           panel.classList.add(styles.active);
@@ -106,3 +113,4 @@ function App() {
 }
 
 export default App;
+

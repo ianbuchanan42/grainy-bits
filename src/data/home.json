@@ -1,0 +1,11 @@
+{
+  "book": {
+    "url": "https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Home/book.jpeg",
+    "alt": "Grainy Bits: Volume 1 Book Cover"
+  },
+  "lomography": {
+    "url": "https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Home/lomography.jpg",
+    "alt": "Lomography Magazine Article Feature"
+  }
+}
+

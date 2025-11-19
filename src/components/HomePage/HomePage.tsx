@@ -1,18 +1,19 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { getAllImages, shuffleArray } from '../../data/helper';
-import styles from './HomePage.module.css';
+import styles from './HomePage.module.scss';
+import { ImageData } from '../../types';
+import useStaggeredImageReveal from '../../hooks/useStaggeredImageReveal';
+import homeData from '../../data/home.json';
 
 const HomePage = () => {
-  const [loadedImages, setLoadedImages] = useState(new Set());
-
   // Get random banner images that persist for the session
-  const bannerImages = useMemo(() => {
+  const bannerImages = useMemo<ImageData[]>(() => {
     const sessionKey = 'grainy-bits-banner-images';
     const stored = sessionStorage.getItem(sessionKey);
 
     if (stored) {
       try {
-        return JSON.parse(stored);
+        return JSON.parse(stored) as unknown as ImageData[];
       } catch {
         // If parsing fails, generate new ones
       }
@@ -29,20 +30,7 @@ const HomePage = () => {
     return selected;
   }, []);
 
-  // Track when each banner image is loaded
-  useEffect(() => {
-    bannerImages.forEach((image) => {
-      const img = new Image();
-      img.onload = () => {
-        setLoadedImages((prev) => new Set([...prev, image.url]));
-      };
-      img.onerror = () => {
-        // Mark as loaded even on error to not block display
-        setLoadedImages((prev) => new Set([...prev, image.url]));
-      };
-      img.src = image.url;
-    });
-  }, [bannerImages]);
+  const { isVisible } = useStaggeredImageReveal(bannerImages);
 
   return (
     <div className={styles.homeContent}>
@@ -57,16 +45,18 @@ const HomePage = () => {
             key={`${image.category}-${image.filename}`}
             className={styles.bannerImageContainer}
           >
+            {/**
+             * Only fade images in once they have finished loading, in a random order.
+             * Keeps the grid lively while avoiding blank slots for slow-loading assets.
+             */}
             <img
               src={image.url}
               alt={image.alt || `Photography by Maggie Carey ${index + 1}`}
-              className={styles.bannerImage}
+              className={`${styles.bannerImage} ${
+                isVisible(image.url) ? styles.bannerImageVisible : ''
+              }`}
               loading='eager'
               decoding='async'
-              style={{
-                opacity: loadedImages.has(image.url) ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-              }}
             />
           </div>
         ))}
@@ -77,8 +67,8 @@ const HomePage = () => {
         <div className={styles.bookContainer}>
           <div className={styles.bookCover}>
             <img
-              src='https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Book/grainybits-volume-one.png'
-              alt='Grainy Bits: Volume 1 Book Cover'
+              src={homeData.book.url}
+              alt={homeData.book.alt}
               className={styles.bookImage}
             />
           </div>
@@ -170,8 +160,8 @@ const HomePage = () => {
 
           <div className={styles.articleImage}>
             <img
-              src='https://afziltusqfvlckjbgkil.supabase.co/storage/v1/object/public/grainy-bits/Article/lomography.jpg'
-              alt='Lomography Magazine Article Feature'
+              src={homeData.lomography.url}
+              alt={homeData.lomography.alt}
               className={styles.articleImagePhoto}
             />
             <p className={styles.articleImageCaption}>

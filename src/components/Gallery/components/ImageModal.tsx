@@ -1,7 +1,15 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import OptimizedImage from './OptimizedImage';
-import styles from '../Gallery.module.css';
+import styles from '../Gallery.module.scss';
+import { ImageData } from '../../../types';
+import useImageModalControls from '../hooks/useImageModalControls';
+
+interface ImageModalProps {
+  imageUrl: string | null;
+  images: ImageData[];
+  onClose: () => void;
+}
 
 /**
  * IMAGE MODAL COMPONENT
@@ -27,108 +35,25 @@ import styles from '../Gallery.module.css';
  * - Slightly larger bundle size
  * - Requires managing current index
  */
-const ImageModal = ({ imageUrl, images, onClose }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const modalRef = useRef(null);
-  const imageRef = useRef(null);
+const ImageModal = ({ imageUrl, images, onClose }: ImageModalProps) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const {
+    currentIndex,
+    currentImage,
+    imageLoaded,
+    handleNext,
+    handlePrevious,
+    handleImageLoad,
+  } = useImageModalControls({ imageUrl, images, onClose });
 
-  // Define navigation handlers first (before useEffect that uses them)
-  const handlePrevious = useCallback(() => {
-    if (!images || images.length === 0) return;
-    setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex > 0 ? prevIndex - 1 : images.length - 1;
-      setImageLoaded(false);
-      return newIndex;
-    });
-  }, [images]);
-
-  const handleNext = useCallback(() => {
-    if (!images || images.length === 0) return;
-    setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex < images.length - 1 ? prevIndex + 1 : 0;
-      setImageLoaded(false);
-      return newIndex;
-    });
-  }, [images]);
-
-  // Find current image index
-  useEffect(() => {
-    if (imageUrl && images) {
-      const index = images.findIndex((img) => img.url === imageUrl);
-      if (index !== -1) {
-        setCurrentIndex(index);
-        setImageLoaded(false); // Reset loading state when image changes
-      }
-    }
-  }, [imageUrl, images]);
-
-  // Preload adjacent images for smooth navigation
-  useEffect(() => {
-    if (!images || images.length === 0) return;
-
-    const preloadImage = (url) => {
-      const img = new Image();
-      img.src = url;
-    };
-
-    // Preload previous image
-    if (currentIndex > 0) {
-      preloadImage(images[currentIndex - 1].url);
-    }
-
-    // Preload next image
-    if (currentIndex < images.length - 1) {
-      preloadImage(images[currentIndex + 1].url);
-    }
-  }, [currentIndex, images]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    if (!imageUrl) return;
-
-    const handleKeyDown = (e) => {
-      switch (e.key) {
-        case 'Escape':
-          onClose();
-          break;
-        case 'ArrowLeft':
-          handlePrevious();
-          break;
-        case 'ArrowRight':
-          handleNext();
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [imageUrl, handlePrevious, handleNext, onClose]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (imageUrl) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = 'unset';
-      };
-    }
-  }, [imageUrl]);
-
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only close if clicking the backdrop, not the image/content
     if (e.target === modalRef.current) {
       onClose();
     }
   };
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
-  if (!imageUrl || !images || images.length === 0) return null;
-
-  const currentImage = images[currentIndex];
+  if (!imageUrl || !currentImage?.url) return null;
 
   return createPortal(
     <div
@@ -150,7 +75,6 @@ const ImageModal = ({ imageUrl, images, onClose }) => {
 
         {/* Main image */}
         <OptimizedImage
-          ref={imageRef}
           src={currentImage.url}
           alt={currentImage.alt || `Gallery image ${currentIndex + 1}`}
           className={styles.modalImage}
@@ -171,7 +95,7 @@ const ImageModal = ({ imageUrl, images, onClose }) => {
               }}
               aria-label='Previous image'
             >
-              ‹
+              <span>‹</span>
             </button>
             <button
               className={`${styles.modalNavButton} ${styles.modalNavButtonRight}`}
@@ -181,7 +105,7 @@ const ImageModal = ({ imageUrl, images, onClose }) => {
               }}
               aria-label='Next image'
             >
-              ›
+              <span>›</span>
             </button>
           </>
         )}
@@ -211,3 +135,4 @@ const ImageModal = ({ imageUrl, images, onClose }) => {
 };
 
 export default ImageModal;
+

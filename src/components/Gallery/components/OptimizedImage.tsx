@@ -1,4 +1,18 @@
-import { forwardRef, useCallback } from 'react';
+import { forwardRef, useCallback, ImgHTMLAttributes } from 'react';
+
+interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'loading' | 'decoding'> {
+  src?: string;
+  alt: string;
+  // Lazy loading props
+  lazy?: boolean;
+  dataSrc?: string; // For lazy loading (uses data-src instead of src)
+  isLoaded?: boolean; // Whether image should be loaded
+  shouldLoadImmediately?: boolean; // Force immediate load
+  // Performance props
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'auto' | 'sync';
+  onLoad?: (url?: string) => void;
+}
 
 /**
  * OPTIMIZED IMAGE COMPONENT
@@ -23,7 +37,7 @@ import { forwardRef, useCallback } from 'react';
  * - Additional abstraction layer
  * - Need to handle different use cases in one component
  */
-const OptimizedImage = forwardRef(
+const OptimizedImage = forwardRef<HTMLImageElement, OptimizedImageProps>(
   (
     {
       src,
